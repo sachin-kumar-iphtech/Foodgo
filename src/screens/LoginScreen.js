@@ -1,10 +1,13 @@
 
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
 const LoginScreen = ({ navigation }) => {
+  const [showPassword, setShowPassword] = useState(false);
   const validationSchema = Yup.object().shape({
     phone: Yup.string()
       .required("Phone number is required")
@@ -42,33 +45,51 @@ const LoginScreen = ({ navigation }) => {
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                 <View style={styles.formContainer}>
+                  <View style={styles.inputRow}>
+                   <MaterialIcons name="phone" size={22} color="#666" style={styles.leftIcon} />
                   {/* Phone Input */}
                   <TextInput
                     placeholder="Enter Number"
-                    style={styles.input}
+                    style={styles.inputWithIcon}
                     keyboardType="numeric"
+                    maxLength={10}
                     value={values.phone}
                     onChangeText={handleChange("phone")}
                     onBlur={handleBlur("phone")}
                   />
+                  </View>
                   {touched.phone && errors.phone && (
                     <Text style={styles.error}>{errors.phone}</Text>
                   )}
-
+                      <View style={styles.inputRow}>
+                   <MaterialIcons name="lock" size={22} color="#666" style={styles.leftIcon} />
                   {/* Password Input */}
                   <TextInput
                     placeholder="Enter Password"
-                    style={styles.input}
+                    style={styles.inputWithIcon}
                     secureTextEntry
                     value={values.password}
                     onChangeText={handleChange("password")}
                     onBlur={handleBlur("password")}
                   />
+                  <TouchableOpacity
+                   onPress={() => setShowPassword(!showPassword)}
+                   style={styles.rightIcon}
+                  >
+                 <Ionicons
+                 name={showPassword ? "eye" : "eye-off"}
+                 size={22}
+                color="#666"
+                />
+               </TouchableOpacity>
+             </View>
                   {touched.password && errors.password && (
                     <Text style={styles.error}>{errors.password}</Text>
                   )}
-
+                  <TouchableOpacity onPress={()=>navigation.navigate("Forget")}>
                   <Text style={styles.forgetText}>Forget Password?</Text>
+                  </TouchableOpacity>
+
 
                   <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                     <Text style={styles.btnText}>Login</Text>
@@ -198,7 +219,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  socialImage: { width: 30, height: 30, borderRadius: 50 },
+  socialImage: { width:25, height: 25, borderRadius: 50 },
   socialImageLarge: { width: 45, height: 45, borderRadius: 50 },
   signUpText: {
     textAlign: "center",
@@ -210,6 +231,31 @@ const styles = StyleSheet.create({
     color: "blue",
     fontWeight: "500",
   },
+  //input row
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#666",
+    borderRadius: 30,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    height: 50,
+    backgroundColor: "white",
+  },
+  leftIcon: {
+    marginRight: 8,
+  },
+  inputWithIcon: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 0,
+  },
+  rightIcon: {
+    marginLeft: 8,
+    padding: 6,
+  },
+  
 });
 
 export default LoginScreen;
