@@ -27,7 +27,7 @@ const ForgetScreen=({navigation})=>{
   style={{ width: 150, height: 150}}
 />
 <Text style={{fontSize:27,fontWeight:700,paddingTop:20}}>Forget Password</Text>
-<Text style={{fontSize:15,paddingTop:15,textAlign:"center"}}>We need your registered number for forget!{"\n"}password</Text>
+<Text style={{fontSize:16,padding:15,textAlign:"center"}}>We need your registered number for forget!{"\n"}password</Text>
 <Formik
               initialValues={{  phone: ""}}
               validationSchema={validationSchema}

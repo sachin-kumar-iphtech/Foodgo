@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -37,9 +39,24 @@ const RegisterScreen = ({ navigation }) => {
             <Formik
               initialValues={{ name: "", phone: "", password: "" }}
               validationSchema={validationSchema}
-              onSubmit={(values) => {
-                console.log("Form Data:", values);
+              onSubmit={async (values, { resetForm }) => {
+                try {
+                  // Convert user data into JSON string
+                  const userData = JSON.stringify(values);
+              
+                  // Save it to local storage
+                  await AsyncStorage.setItem("userData", userData);
+              
+                  alert("Registration Successful!");
+                  resetForm();
+              
+                  // Navigate to Login Screen
+                  navigation.navigate("Login");
+                } catch (error) {
+                  console.log("Error saving data:", error);
+                }
               }}
+              
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                 <View style={styles.formContainer}>

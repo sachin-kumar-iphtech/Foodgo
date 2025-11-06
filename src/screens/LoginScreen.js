@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
@@ -39,9 +40,28 @@ const LoginScreen = ({ navigation }) => {
             <Formik
               initialValues={{ phone: "", password: "" }}
               validationSchema={validationSchema}
-              onSubmit={(values) => {
-                console.log("Form Data:", values);
+              onSubmit={async (values) => {
+                try {
+                  const storedData = await AsyncStorage.getItem("userData");
+              
+                  if (storedData !== null) {
+                    const user = JSON.parse(storedData);
+              
+                    if (user.phone === values.phone && user.password === values.password) {
+                      await AsyncStorage.setItem("isLoggedIn", "true"); // ✅ set flag
+                      alert("Login Successful!");
+                      navigation.navigate("Home");
+                    } else {
+                      alert("Invalid Phone or Password!");
+                    }
+                  } else {
+                    alert("No user found. Please register first!");
+                  }
+                } catch (error) {
+                  console.log("Error retrieving user data:", error);
+                }
               }}
+              
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                 <View style={styles.formContainer}>
@@ -67,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
                   <TextInput
                     placeholder="Enter Password"
                     style={styles.inputWithIcon}
-                    secureTextEntry
+                    secureTextEntry={!showPassword} 
                     value={values.password}
                     onChangeText={handleChange("password")}
                     onBlur={handleBlur("password")}
