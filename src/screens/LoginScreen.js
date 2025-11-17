@@ -20,7 +20,7 @@ const LoginScreen = ({ navigation }) => {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0d0475" }}>
+    <View style={{ flex: 1, backgroundColor: "#EF2A39" }}>
       <Text style={styles.welcomeText}>Welcome Back !</Text>
 
       <View style={styles.whiteContainer}>
@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
         >
           <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
             <Text style={styles.logoText}>
-              ☀︎ afri<Text style={{ color: "red" }}>valley ♕</Text>
+            Foodgo
             </Text>
 
             <Text style={styles.infoText}>
@@ -177,8 +177,10 @@ const styles = StyleSheet.create({
   },
   logoText: {
     textAlign: "center",
-    fontSize: 27,
-    color: "blue",
+    fontSize: 30,
+    color: "#EF2A39",
+    fontFamily:"cursive",
+    fontWeight:"800"
   },
   infoText: {
     textAlign: "center",
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   button: {
-    backgroundColor: "#0d0475",
+    backgroundColor: "#EF2A39",
     padding: 12,
     borderRadius: 30,
     marginTop: 20,

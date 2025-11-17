@@ -23,7 +23,7 @@ const RegisterScreen = ({ navigation }) => {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#0d0475" }}>
+    <View style={{ flex: 1, backgroundColor: "#EF2A39" }}>
       <Text style={styles.headerText}>Create an Account</Text>
 
       <View style={styles.whiteContainer}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#0d0475",
+    backgroundColor: "#EF2A39",
     padding: 12,
     borderRadius: 30,
     marginTop: 20,
