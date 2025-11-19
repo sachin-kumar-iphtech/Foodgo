@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect,useRef} from "react";
 import {
   View,
   Text,
@@ -7,13 +7,149 @@ import {
   Image,
   TextInput,
   FlatList,
+  Animated
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import burgerJson from "../data/burgers.json";
 
 const HomeScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("1");
+  const [burgerList,setBurgerList]=useState([]);
+  const [filterdList,setFilteredList]=useState([]);
+  //for filter 
+  const [foodType, setFoodType] = useState(null); // veg / nonveg / null
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  const IMAGES = {
+    image6: require("../../assets/image6.png"),
+    image5: require("../../assets/image5.png"),
+    image4: require("../../assets/image4.png"),
+    image3: require("../../assets/image3.png"),
+    combo1: require("../../assets/combo1.png"),
+    combo2: require("../../assets/combo2.png"),
+    wrap1: require("../../assets/wrap1.jpeg"),
+    wrap3: require("../../assets/wrap3.png"),
+  };
+  
+  // useEffect for fetching json data
+  useEffect(() => {
+    const mapped = burgerJson.map(item => ({
+      ...item,
+      image:IMAGES[item.image]
+    }));
+  
+    setBurgerList(mapped);
+    setFilteredList(mapped);
+  }, []);
+//useEffect end 
+// FOOD TYPE FILTER FUNCTION
+const applyFoodType = (type) => {
+  setFoodType(type);
+
+  let updatedList = [...burgerList];
+
+  // SEARCH FILTER
+  if (searchText.trim() !== "") {
+    updatedList = updatedList.filter((item) =>
+      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.sub.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }
+
+  // FOOD TYPE FILTER: veg / nonveg
+  if (type !== null) {
+    updatedList = updatedList.filter((item) => item.type === type);
+  }
+
+  setFilteredList(updatedList);
+};
+
+// text input filter logic
+const handleSearch = (text) => {
+  setSearchText(text);
+
+  const query = text.toLowerCase();
+
+  // Agar empty ho → saara data wapas
+  if (query === "") {
+    setFilteredList(burgerList);
+    return;
+  }
+
+  // Filter logic
+  const result = burgerList.filter(item =>
+    item.name.toLowerCase().includes(query) ||
+    item.sub.toLowerCase().includes(query)
+  );
+
+  setFilteredList(result);
+};
+// end
+//filter popup logic
+const openPopup = () => {
+  setShowFilterPopup(true);
+
+  Animated.parallel([
+    Animated.timing(opacityAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }),
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 8,
+      useNativeDriver: true,
+    }),
+  ]).start();
+};
+
+const closePopup = () => {
+  Animated.parallel([
+    Animated.timing(opacityAnim, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }),
+    Animated.timing(scaleAnim, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }),
+  ]).start(() => setShowFilterPopup(false));
+};
+//haldleCategorySelect
+const handleCategorySelect = (id) => {
+  setSelectedCategory(id);
+
+  let updated = [...burgerList]; // All items
+
+  // Selected category ka object uthao
+  const selected = categories.find(c => c.id === id);
+
+  // Agar category All nahi hai → filter items
+  if (selected.title !== "All") {
+    updated = updated.filter(item => item.category === selected.title.toLowerCase());
+  }
+
+  // Agar search text already filled hai → search bhi apply ho
+  if (searchText.trim() !== "") {
+    updated = updated.filter(item =>
+      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.sub.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }
+
+  // Agar veg/nonveg filter active hai
+  if (foodType !== null) {
+    updated = updated.filter(item => item.type === foodType);
+  }
+
+  setFilteredList(updated);
+};
 
 
   const handleLogout = async () => {
@@ -29,7 +165,7 @@ const HomeScreen = ({ navigation }) => {
   const categories = [
     { id: "1", title: "All", bgColor: "#EF2A39", textColor: "#F5F5F5" },
     { id: "2", title: "Combos", bgColor: "#F3F4F6", textColor: "#6A6A6A" },
-    { id: "3", title: "Sliders", bgColor: "#F3F4F6", textColor: "#6A6A6A" },
+    { id: "3", title: "Wraps", bgColor: "#F3F4F6", textColor: "#6A6A6A" },
     { id: "4", title: "Classic", bgColor: "#F3F4F6", textColor: "#6A6A6A" },
   ];
 
@@ -109,9 +245,10 @@ const HomeScreen = ({ navigation }) => {
             placeholder="Search"
             placeholderTextColor="#3C2F2F"
             value={searchText}
-            onChangeText={setSearchText}
+            onChangeText={handleSearch}
           />
         </View>
+        <TouchableOpacity  onPress={openPopup}>
         <View style={styles.filterBtn}>
           {/* <Image
             source={require("../../assets/settings-sliders.png")}
@@ -119,7 +256,11 @@ const HomeScreen = ({ navigation }) => {
           /> */}
           <Ionicons name="options" size={25} color="white" />
         </View>
+        </TouchableOpacity>
+        
+
       </View>
+      
 
       {/* Categories */}
       <View style={{ marginTop: 60}}>
@@ -131,7 +272,7 @@ const HomeScreen = ({ navigation }) => {
   contentContainerStyle={styles.categoryList}
   renderItem={({ item }) => (
     <TouchableOpacity
-      onPress={() => setSelectedCategory(item.id)}
+    onPress={() => handleCategorySelect(item.id)}
       style={[
         styles.categoryItem,
         {
@@ -158,10 +299,17 @@ const HomeScreen = ({ navigation }) => {
 />
 
       </View>
+      {filterdList.length === 0 && (
+  <View style={{ alignItems: "center", marginTop: 40 }}>
+    <Text style={{ fontSize: 18, color: "#6A6A6A", fontWeight: "600" }}>
+      Item not found
+    </Text>
+  </View>
+)}
 
       {/*  Burger List */}
       <FlatList
-        data={burgerData}
+        data={filterdList}
         numColumns={2}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
@@ -192,7 +340,59 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
       />
+         
+{/* filter popup*/}
+{showFilterPopup && (
+  <Animated.View
+    style={[
+      styles.popupOverlay,
+      { opacity: opacityAnim }
+    ]}
+  >
+    <TouchableOpacity
+      style={{ flex: 1 }}
+      onPress={closePopup}
+      activeOpacity={1}
+    />
+
+    <Animated.View
+      style={[
+        styles.popupBox,
+        {
+          transform: [{ scale: scaleAnim }],
+        }
+      ]}
+    > 
+    <View style={{width:"100%",height:1,backgroundColor:"lightgray",marginTop:10}}></View>
+      <Text style={styles.popupTitle}>Filter By</Text>
+
+      <TouchableOpacity 
+        style={styles.popupItem} 
+        onPress={() => { applyFoodType("veg"); closePopup(); }}
+      >
+        <Text style={styles.popupText}>Veg</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.popupItem}
+        onPress={() => { applyFoodType("nonveg"); closePopup(); }}
+      >
+        <Text style={styles.popupText}>Non-Veg</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={[styles.popupItem, { backgroundColor: "#FFE5E5" }]}
+        onPress={() => { applyFoodType(null); closePopup(); }}
+      >
+        <Text style={[styles.popupText, { color: "red" }]}>Clear Filter</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  </Animated.View>
+)}
+
+
     </View>
+    
   );
 };
 
@@ -221,14 +421,14 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     resizeMode: "contain",
-    top:20
+    top:10
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    top: 40,
+    paddingHorizontal: 15,
+    top: 45,
     shadowColor:"#FFFFFF",
     shadowOpacity:"0.5%"
   },
@@ -267,9 +467,9 @@ const styles = StyleSheet.create({
   },
   categoryList: {
     paddingHorizontal: 10,
-    marginTop: 20, // smaller gap
+    marginTop: 25,
     columnGap: 10,
-    marginBottom:12
+    marginBottom:15
   },
   categoryItem: {
     height: 50,
@@ -280,7 +480,7 @@ const styles = StyleSheet.create({
     shadowColor:"#6A6A6A",
     backgroundColor:"#F3F4F6",
     shadowOpacity:0.5,
-    elevation:6,
+    elevation:10,
   },
   burgerList: {
     paddingHorizontal: 10,
@@ -304,12 +504,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontWeight: "700",
-    left: 20,
+    left: 15,
     color:"#3C2F2F",
   },
   cardSub: {
-    left: 20,
+    left: 15,
     color:"#3C2F2F",
+    fontSize:13
   },
   cardRating: {
     left: 20,
@@ -323,6 +524,55 @@ const styles = StyleSheet.create({
     bottom: 10,
     fontWeight:"bold",
   },
+  // filter popup
+  popupOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)", // for  transparent bg
+    justifyContent: "flex-end",
+  },
+  
+  popupBox: {
+    backgroundColor: "white",
+    width: "100%",
+    height:"48%",
+    padding: 20,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius:0,
+    borderTopRightRadius:25,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    position:"absolute",
+    zIndex:999
+    
+  
+  },
+  
+  popupTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#3C2F2F",
+    marginBottom: 15,
+    marginTop:25
+  },
+  
+  popupItem: {
+    padding: 15,
+    backgroundColor: "#F7F7F7",
+    borderRadius: 12,
+    marginVertical: 8,
+  },
+  
+  popupText: {
+    fontSize: 16,
+    color: "#3C2F2F",
+    fontWeight: "600",
+  },
+  
 });
 
 export default HomeScreen;
