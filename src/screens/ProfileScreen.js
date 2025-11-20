@@ -44,19 +44,19 @@ const ProfileScreen = ({ navigation }) => {
         <View style={{top:80,}}>
           <View style={{}}>
           <Text style={{color:"#808080",marginStart:60,fontWeight:"600",fontSize:15,top:13,zIndex:2,height:24,width:55,backgroundColor:"white",paddingStart:7}}>Name</Text>
-          <TextInput placeholder="Sophia Patel" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
+          <TextInput value="Sophia Patel" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
           </View>
           <View style={{}}>
           <Text style={{color:"#808080",marginStart:60,fontWeight:"600",fontSize:15,top:13,zIndex:2,height:24,width:55,backgroundColor:"white",paddingStart:7}}>Email</Text>
-          <TextInput placeholder="sophiapatel@gmail.com" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
+          <TextInput value="sophiapatel@gmail.com" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
           </View>
           <View style={{}}>
           <Text style={{color:"#808080",marginStart:60,fontWeight:"600",fontSize:15,top:13,zIndex:2,height:24,width:130,backgroundColor:"white",paddingStart:7}}>Delivery Address</Text>
-          <TextInput placeholder="123 Main St Apartment 4A,New York, NY" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
+          <TextInput value="123 Main St Apartment 4A,New York, NY" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
           </View>
           <View style={{}}>
           <Text style={{color:"#808080",marginStart:60,fontWeight:"600",fontSize:15,top:13,zIndex:2,height:24,width:110,backgroundColor:"white",paddingStart:7}}>Password  <Ionicons name="lock-closed" size={20} color="#808080" /></Text>
-          <TextInput placeholder="● ● ● ● ● ● ● ● ●" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",fontSize:20,color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
+          <TextInput value="● ● ● ● ● ● ● ● ●" editable={false} style={{borderWidth:2,borderColor:"#E1E1E1",width:"85%",borderRadius:20,paddingStart:45,fontWeight:"800",fontSize:20,color:"#3C2F2F",marginHorizontal:30,height:55}}></TextInput>
           </View>
           <View style={{backgroundColor:"#E1E1E1",width:315,height:1,top:40,left:40}}></View>
           <TouchableOpacity style={{top:80,left:40}}><Text style={{fontSize:20,color:"#808080",fontWeight:"500"}}>Payment Details                             <Text><Ionicons name="chevron-forward" size={22} color="#777" /></Text></Text></TouchableOpacity>

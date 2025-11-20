@@ -19,7 +19,7 @@ import Product2Screen from "./src/screens/Product2Screen";
 import Product3Screen from "./src/screens/Product3Screen";
 import Product4Screen from "./src/screens/Product4Screen";
 import PaymentScreen from "./src/screens/PaymentScreen";
-
+import ProductDetails from "./src/screens/ProductDetails";
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -44,6 +44,8 @@ const App = () => {
         <Stack.Screen name="Product3Screen" component={Product3Screen}/>
         <Stack.Screen name="Product4Screen" component={Product4Screen}/>
         <Stack.Screen name="PaymentScreen" component={PaymentScreen}/>
+        <Stack.Screen name="ProductDetails" component={ProductDetails} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -9,9 +9,12 @@ import {
   FlatList,
   Animated
 } from "react-native";
+import { PanResponder } from "react-native";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import burgerJson from "../data/burgers.json";
+import productDetails from "../data/productDetails.json";
 
 const HomeScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
@@ -19,11 +22,22 @@ const HomeScreen = ({ navigation }) => {
   const [burgerList,setBurgerList]=useState([]);
   const [filterdList,setFilteredList]=useState([]);
   //for filter 
-  const [foodType, setFoodType] = useState(null); // veg / nonveg / null
+  const [foodType, setFoodType] = useState(null); 
   const [showFilterPopup, setShowFilterPopup] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+  const translateYAnim = useRef(new Animated.Value(300)).current; 
+  const [selectedRating, setSelectedRating] = useState(null);
+ // min–max price
+  // slider states
+const [price, setPrice] = useState(20);    
+const [rating, setRating] = useState(3);    
+const priceX = useRef(new Animated.Value(0)).current;
+const ratingX = useRef(new Animated.Value(0)).current;
+const [liked, setLiked] = useState([]);
 
+
+  
   const IMAGES = {
     image6: require("../../assets/image6.png"),
     image5: require("../../assets/image5.png"),
@@ -49,24 +63,28 @@ const HomeScreen = ({ navigation }) => {
 // FOOD TYPE FILTER FUNCTION
 const applyFoodType = (type) => {
   setFoodType(type);
-
+  if (!burgerList || burgerList.length === 0) {
+    return; 
+  }
+  
   let updatedList = [...burgerList];
 
   // SEARCH FILTER
   if (searchText.trim() !== "") {
-    updatedList = updatedList.filter((item) =>
+    updatedList = updatedList.filter(item =>
       item.name.toLowerCase().includes(searchText.toLowerCase()) ||
       item.sub.toLowerCase().includes(searchText.toLowerCase())
     );
   }
 
-  // FOOD TYPE FILTER: veg / nonveg
-  if (type !== null) {
-    updatedList = updatedList.filter((item) => item.type === type);
+  // FOOD TYPE FILTER (Corrected)
+  if (type !== null && type !== "all") {
+    updatedList = updatedList.filter(item => item.type === type);
   }
 
   setFilteredList(updatedList);
 };
+
 
 // text input filter logic
 const handleSearch = (text) => {
@@ -99,43 +117,52 @@ const openPopup = () => {
       duration: 500,
       useNativeDriver: true,
     }),
-    Animated.spring(scaleAnim, {
-      toValue: 1,
+    Animated.spring(translateYAnim, {
+      toValue: 0,
       friction: 8,
       useNativeDriver: true,
     }),
   ]).start();
 };
 
+
 const closePopup = () => {
   Animated.parallel([
     Animated.timing(opacityAnim, {
       toValue: 0,
-      duration: 250,
+      duration: 200,
       useNativeDriver: true,
     }),
-    Animated.timing(scaleAnim, {
-      toValue: 0,
-      duration: 250,
+    Animated.timing(translateYAnim, {
+      toValue: 300,
+      duration: 200,
       useNativeDriver: true,
     }),
   ]).start(() => setShowFilterPopup(false));
 };
+
 //haldleCategorySelect
 const handleCategorySelect = (id) => {
+  // If data not loaded yet → don't filter
+  if (!burgerList || burgerList.length === 0) {
+    return;  // Data not loaded yet → do NOT filter
+  }
+  
+
   setSelectedCategory(id);
 
-  let updated = [...burgerList]; // All items
+  let updated = [...burgerList];
 
-  // Selected category ka object uthao
   const selected = categories.find(c => c.id === id);
 
-  // Agar category All nahi hai → filter items
+  // Category filter
   if (selected.title !== "All") {
-    updated = updated.filter(item => item.category === selected.title.toLowerCase());
+    updated = updated.filter(
+      item => item.category.toLowerCase() === selected.title.toLowerCase()
+    );
   }
 
-  // Agar search text already filled hai → search bhi apply ho
+  // Search filter
   if (searchText.trim() !== "") {
     updated = updated.filter(item =>
       item.name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -143,13 +170,118 @@ const handleCategorySelect = (id) => {
     );
   }
 
-  // Agar veg/nonveg filter active hai
-  if (foodType !== null) {
+  // food type filter
+  if (foodType && foodType !== "all") {
     updated = updated.filter(item => item.type === foodType);
   }
 
   setFilteredList(updated);
 };
+
+
+const applyFilters = () => {
+  let updated = [...burgerList];
+  if (!burgerList || burgerList.length === 0) {
+    return;  // Data not loaded yet → do NOT filter
+  }
+  
+  // SEARCH FILTER
+  if (searchText.trim() !== "") {
+    updated = updated.filter(item =>
+      item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.sub.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }
+
+  //  FOOD TYPE 
+  if (foodType && foodType !== "all") {
+    updated = updated.filter(item => item.type === foodType);
+  }
+
+  //  RATING FILTER
+  updated = updated.filter(item => Number(item.rating) >= Number(rating));
+
+  // PRICE FILTER
+  updated = updated.filter(item => item.price <= price);
+
+  //  CATEGORY FILTER (keep it LAST)
+  const selected = categories.find(c => c.id === selectedCategory);
+  if (selected && selected.title.toLowerCase() !== "all") {
+    updated = updated.filter(
+      item => item.category.toLowerCase() === selected.title.toLowerCase()
+    );
+  }
+
+  setFilteredList(updated);
+  closePopup();
+};
+
+
+
+
+
+const clearFilters = () => {
+  setFoodType(null);
+  setRating(0);
+  setPrice(50);
+  setFilteredList(burgerList);
+  closePopup();
+};
+
+
+const priceResponder = useRef(
+  PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, gesture) => {
+      let pos = Math.min(Math.max(gesture.dx, 0), 260);
+      priceX.setValue(pos);
+
+      const newPrice = Math.round((pos / 260) * 50);
+      setPrice(newPrice);
+    }
+  })
+).current;
+
+const ratingResponder = useRef(
+  PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (_, gesture) => {
+      let pos = Math.min(Math.max(gesture.dx, 0), 260);
+      ratingX.setValue(pos);
+
+      const newRating = ((pos / 260) * 5).toFixed(1);
+      setRating(newRating);
+    }
+  })
+).current;
+useEffect(() => {
+  loadLikes();
+}, []);
+
+const loadLikes = async () => {
+  try {
+    const data = await AsyncStorage.getItem("likedItems");
+    if (data) {
+      setLiked(JSON.parse(data));
+    }
+  } catch (error) {
+    console.log("Error loading likes", error);
+  }
+};
+const toggleLike = async (id) => {
+  let updatedLikes = [...liked];
+
+  if (updatedLikes.includes(id)) {
+    updatedLikes = updatedLikes.filter(item => item !== id);
+  } else {
+    updatedLikes.push(id);
+  }
+
+  setLiked(updatedLikes);
+  await AsyncStorage.setItem("likedItems", JSON.stringify(updatedLikes));
+};
+const isLiked = (id) => liked.includes(id);
+
 
 
   const handleLogout = async () => {
@@ -319,9 +451,8 @@ const handleCategorySelect = (id) => {
         }}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() =>
-              item.navigate && navigation.navigate(item.navigate)
-            }
+          onPress={() => navigation.navigate("ProductDetails", {productId: item.id })}
+          key={item.id}
             style={styles.card}
           >
             <Image source={item.image} style={styles.cardImage} />
@@ -330,9 +461,17 @@ const handleCategorySelect = (id) => {
             <Text style={styles.cardRating}>
               ★ <Text style={{ color: "#3C2F2F",fontWeight:"bold",fontSize:15 }}>{item.rating}</Text>
             </Text>
-            <Text style={styles.heartIcon}>
+            {/* <Text style={styles.heartIcon}>
               <Ionicons name="heart-outline" size={24} color="#3C2F2F"/>
-            </Text>
+            </Text> */}
+            <TouchableOpacity onPress={() => toggleLike(item.id)} style={styles.heartIcon}>
+  <Ionicons 
+    name={isLiked(item.id) ? "heart" : "heart-outline"} 
+    size={24} 
+    color={isLiked(item.id) ? "red" : "gray"} 
+  />
+</TouchableOpacity>
+
             {/* <Image
             source={require("../../assets/heart1.png")}
             style={{ resizeMode: "cover",height:22,width:22, top:-20,left:130}}
@@ -344,51 +483,127 @@ const handleCategorySelect = (id) => {
 {/* filter popup*/}
 {showFilterPopup && (
   <Animated.View
-    style={[
-      styles.popupOverlay,
-      { opacity: opacityAnim }
-    ]}
+    style={[styles.popupOverlay, { opacity: opacityAnim }]}
   >
-    <TouchableOpacity
-      style={{ flex: 1 }}
-      onPress={closePopup}
-      activeOpacity={1}
-    />
+    {/* Background Tap to Close */}
+    <TouchableOpacity style={{ flex: 1 }} onPress={closePopup} />
 
+    {/* Bottom Sheet */}
     <Animated.View
       style={[
         styles.popupBox,
-        {
-          transform: [{ scale: scaleAnim }],
-        }
+        { transform: [{ translateY: translateYAnim }] }
       ]}
-    > 
-    <View style={{width:"100%",height:1,backgroundColor:"lightgray",marginTop:10}}></View>
-      <Text style={styles.popupTitle}>Filter By</Text>
+    >
+      <Text style={styles.popupTitle}>Filter Options</Text>
 
-      <TouchableOpacity 
-        style={styles.popupItem} 
-        onPress={() => { applyFoodType("veg"); closePopup(); }}
-      >
-        <Text style={styles.popupText}>Veg</Text>
-      </TouchableOpacity>
+      {/* Food Type */}
+      <Text style={styles.sectionTitle}>Food Type</Text>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[
+            styles.optionBtn,
+            foodType === null && styles.selectedOption
+          ]}
+          onPress={() => setFoodType(null)}
+        >
+          <Text style={styles.optionText}>All</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.popupItem}
-        onPress={() => { applyFoodType("nonveg"); closePopup(); }}
-      >
-        <Text style={styles.popupText}>Non-Veg</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.optionBtn,
+            foodType === "veg" && styles.selectedOption
+          ]}
+          onPress={() => setFoodType("veg")}
+        >
+          <Text style={styles.optionText}>Veg</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.popupItem, { backgroundColor: "#FFE5E5" }]}
-        onPress={() => { applyFoodType(null); closePopup(); }}
-      >
-        <Text style={[styles.popupText, { color: "red" }]}>Clear Filter</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.optionBtn,
+            foodType === "nonveg" && styles.selectedOption
+          ]}
+          onPress={() => setFoodType("nonveg")}
+        >
+          <Text style={styles.optionText}>Non-Veg</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Rating */}
+      <Text style={styles.sectionTitle}>Rating: ⭐ {rating}</Text>
+
+<View style={{ height: 40,left:30,top:10 }}>
+  <View
+    style={{
+      width: 295,
+      height: 5,
+      backgroundColor: "#ddd",
+      borderRadius: 10
+    }}
+  />
+
+  <Animated.View
+    {...ratingResponder.panHandlers}
+    style={{
+      height: 25,
+      width: 25,
+      backgroundColor: "#EF2A39",
+      borderRadius: 12,
+      position: "absolute",
+      top: -10,
+      transform: [{ translateX: ratingX }]
+    }}
+  />
+</View>
+
+      {/* Price Range */}
+
+      <View style={styles.sliderRow}>
+      <Text style={styles.sectionTitle}>Price: $ {price}</Text>
+
+<View style={{ height: 40, marginTop: 10,left:30 }}>
+  <View
+    style={{
+      width: 295,
+      height: 5,
+      backgroundColor: "#ddd",
+      borderRadius: 10
+    }}
+  />
+
+  <Animated.View
+    {...priceResponder.panHandlers}
+    style={{
+      height: 25,
+      width: 25,
+      backgroundColor: "#EF2A39",
+      borderRadius: 12,
+      position: "absolute",
+      top: -10,
+      transform: [{ translateX: priceX }]
+    }}
+  />
+</View>
+
+      </View>
+
+      {/* Buttons */}
+      <View style={styles.btnRow}>
+        <TouchableOpacity style={styles.clearBtn} onPress={clearFilters}>
+          <Text style={styles.clearText}>Clear</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.applyBtn} onPress={applyFilters}>
+          <Text style={styles.applyText}>Apply</Text>
+        </TouchableOpacity>
+      </View>
+
     </Animated.View>
   </Animated.View>
 )}
+
 
 
     </View>
@@ -554,10 +769,11 @@ const styles = StyleSheet.create({
   
   popupTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "800",
     color: "#3C2F2F",
-    marginBottom: 15,
-    marginTop:25
+    marginBottom: 10,
+    marginTop:15,
+    textAlign:"center"
   },
   
   popupItem: {
@@ -572,6 +788,94 @@ const styles = StyleSheet.create({
     color: "#3C2F2F",
     fontWeight: "600",
   },
+  popupBox: {
+    backgroundColor: "white",
+    width: "100%",
+    height:"65%",
+    padding: 20,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    position: "absolute",
+    bottom: 0,
+  },
+  
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 20,
+    marginBottom: 10,
+    left:30
+  },
+  
+  row: {
+    flexDirection: "row",
+    gap: 10,
+    justifyContent:"space-evenly"
+  },
+  
+  optionBtn: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 10,
+   
+  },
+  
+  selectedOption: {
+    backgroundColor: "#EF2A39",
+  },
+  
+  optionText: {
+    fontWeight: "600",
+    color: "#3C2F2F",
+  },
+  
+  sliderRow: {
+   marginBottom: 10,
+  },
+  
+  priceInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
+    borderRadius: 10,
+    width: 70,
+    textAlign: "center",
+    fontWeight: "600",
+  },
+  
+  btnRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+  },
+  
+  clearBtn: {
+    width: "35%",
+    padding: 15,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  
+  applyBtn: {
+    width: "35%",
+    padding: 15,
+    backgroundColor: "#EF2A39",
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  
+  applyText: {
+    color: "white",
+    fontWeight: "700",
+  },
+  
+  clearText: {
+    fontWeight: "700",
+    color: "#EF2A39",
+  },
+  
   
 });
 
