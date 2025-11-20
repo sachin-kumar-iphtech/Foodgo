@@ -1,0 +1,99 @@
+[
+    {
+      "id": "1",
+      "name": "Cheeseburger",
+      "sub": "Wendy's Burger",
+      "rating": "4.9",
+      "time": "26 mins",
+      "price": 4.12,
+      "description": "A classic cheeseburger made with a juicy beef patty, melted cheese, lettuce and tomatoes. This is one of the most popular Wendy's burgers known for its bold flavour.",
+      "image": "image9",
+      "type": "veg",
+      "category": "classic"
+    },
+    {
+      "id": "2",
+      "name": "Hamburger",
+      "sub": "Veggie Burger",
+      "rating": "4.8",
+      "time": "22 mins",
+      "price": 3.20,
+      "description": "A delicious veggie burger made with fresh vegetables and spices. Perfect for vegetarian lovers looking for a flavorful bite.",
+      "image": "image10",
+      "type": "veg",
+      "category": "classic"
+    },
+    {
+      "id": "3",
+      "name": "Hamburger",
+      "sub": "Chicken Burger",
+      "rating": "4.6",
+      "time": "24 mins",
+      "price": 4.80,
+      "description": "A crispy and juicy chicken burger topped with lettuce and sauce. Great choice for chicken lovers.",
+      "image": "image11",
+      "type": "nonveg",
+      "category": "classic"
+    },
+    {
+      "id": "4",
+      "name": "Hamburger",
+      "sub": "Fried Chicken Burger",
+      "rating": "4.5",
+      "time": "25 mins",
+      "price": 5.10,
+      "description": "Fried chicken patty loaded with special sauces and crunchy veggies. A perfect blend of crispiness and taste.",
+      "image": "image12",
+      "type": "nonveg",
+      "category": "classic"
+    },
+    {
+      "id": "5",
+      "name": "Sprite Combo",
+      "sub": "Chicken Sandwich Combo",
+      "rating": "4.9",
+      "time": "28 mins",
+      "price": 6.50,
+      "description": "A combo that includes a crispy chicken sandwich served with Sprite and fries. A satisfying meal box.",
+      "image": "combo1",
+      "type": "nonveg",
+      "category": "combos"
+    },
+    {
+      "id": "6",
+      "name": "Fanta Combo",
+      "sub": "Chicken Sandwich Combo",
+      "rating": "4.8",
+      "time": "30 mins",
+      "price": 6.70,
+      "description": "Includes a crispy chicken sandwich served with chilled Fanta and fries. Perfect for combo lovers.",
+      "image": "combo2",
+      "type": "nonveg",
+      "category": "combos"
+    },
+    {
+      "id": "7",
+      "name": "Wrap",
+      "sub": "Chicken Wrap",
+      "rating": "4.8",
+      "time": "20 mins",
+      "price": 3.99,
+      "description": "A soft tortilla wrap filled with spicy grilled chicken and fresh veggies. Light, tasty and filling.",
+      "image": "wrap1",
+      "type": "nonveg",
+      "category": "wraps"
+    },
+    {
+      "id": "8",
+      "name": "Wrap",
+      "sub": "Paneer Wrap",
+      "rating": "4.8",
+      "time": "18 mins",
+      "price": 3.50,
+      "description": "A delicious paneer wrap filled with fresh veggies and creamy sauce. Best vegetarian choice.",
+      "image": "wrap3",
+      "type": "veg",
+      "category": "wraps"
+    }
+  ]
+  

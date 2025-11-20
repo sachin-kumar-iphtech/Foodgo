@@ -63,7 +63,9 @@ const Product1Screen = () => {
         <View style={{height:50,width:50,backgroundColor:"#3C2F2F",borderRadius:25,justifyContent:"center",alignItems:"center"}}><Ionicons name="person" size={24} color="#FFFFFF" /></View>
         <View style={{height:80,width:250,backgroundColor:"#F3F4F6",borderRadius:20,justifyContent:"center",alignItems:'center',left:15}}><Text style={{color:"#3C2F2F",fontFamily:"roboto",fontSize:17,fontWeight:700,paddingHorizontal:15}}>It'll get 25 minutes to arrive to your address</Text></View>
       </View>
+      
       <View style={{flexDirection:"row",right:20,justifyContent:"flex-end",top:180}}>
+      <Text style={{color:"#DBDADA",fontSize:14,left:170,top:-30,fontWeight:500}}>26 minutes ago</Text>
       <View style={{height:80,width:250,backgroundColor:"#EF2A39",borderRadius:20,justifyContent:"center",alignItems:'center',right:20,padding:20}}><Text style={{color:"#ffffff",fontFamily:"roboto",fontSize:17,fontWeight:700}}>Ok, thanks you for your support</Text></View>
         <View style={{height:50,width:50,backgroundColor:"#EF2A39",borderRadius:25,justifyContent:"center",alignItems:"center"}}>
            <Image
@@ -85,16 +87,17 @@ const Product1Screen = () => {
       width: 350,
       borderRadius: 20,
       backgroundColor: "#FFFFFF",
-      elevation: 2,
+      elevation: 8,
       flexDirection: "row",
       alignItems: "center",
       paddingStart: 30,
       top:-30,
+      
     }}
   >
     <TextInput 
-      style={{ flex: 1, fontSize: 18,color:"#DBDADA",fontWeight:400 }}
-      placeholder="Type here"
+      style={{ flex: 1, fontSize: 20,color:"#DBDADA",fontWeight:500 }}
+      placeholder="Type here.."
     />
 
     <TouchableOpacity 

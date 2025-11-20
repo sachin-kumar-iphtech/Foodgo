@@ -1,0 +1,84 @@
+[
+    {
+        "id":"1",
+        "name": "Cheeseburger",
+        "sub": "Wendy's Burger",
+        "rating": "4.9",
+        "image": "image6",
+        "navigate":"Product1Screen",
+        "type":"veg",
+         "category":"classic"
+    },
+    {
+        "id":"2",
+        "name":"Hamburger",
+        "sub":"Veggie Burger",
+        "rating":"4.8",
+        "image":"image5",
+        "navigate":"Product2Screen",
+         "type":"veg",
+          "category":"classic"
+    },
+    {
+        "id":"3",
+        "name":"Hamburger",
+        "sub":"Chicken Burger",
+        "rating":"4.6",
+        "image":"image4",
+        "navigate":"Product3Screen",
+         "type":"nonveg",
+          "category":"classic"
+    },
+    {
+        "id":"4",
+        "name":"Hamburger",
+        "sub":"Fried Chicken Burger",
+        "rating":"4.5",
+        "image":"image3",
+        "navigate":"Product4Screen",
+        "type":"nonveg",
+         "category":"classic"
+    },
+    {
+        "id":"5",
+        "name":"Sprite Combo",
+        "sub":"Chicken Sandwich Combo",
+        "rating":"4.9",
+        "image":"combo1",
+        "type":"nonveg",
+        "category":"combos"
+
+        
+    },
+    {
+        "id":"6",
+        "name":"Fanta Combo",
+        "sub":"Chicken Sandwich Combo",
+        "rating":"4.8",
+        "image":"combo2",
+        "type":"nonveg",
+        "category":"combos"
+
+       
+    },
+    {
+        "id":"7",
+        "name":"Wrap",
+        "sub":"Chicken Wrap",
+        "rating":"4.8",
+        "image":"wrap1",
+        "type":"nonveg",
+        "category":"wraps"
+       
+    },
+    {
+        "id":"8",
+        "name":"Wrap",
+        "sub":"Paneer Wrap",
+        "rating":"4.8",
+        "image":"wrap3",
+        "type":"veg",
+        "category":"wraps"
+       
+    }
+]
